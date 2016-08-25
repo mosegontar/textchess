@@ -1,5 +1,5 @@
 import re
-from game_validation import Validator
+#from game_validation import Validator
 
 class Board(object):
 
@@ -21,6 +21,16 @@ class Board(object):
             print str(8-row_num) + '   ', ' '.join(row)
         print
 
+    def update_board(self, piece, origin, dest):
+
+        origin_row = list(self.board[origin[0]])
+        origin_row[origin[1]] = '.'
+        self.board[origin[0]] = origin_row
+        
+        dest_row = list(self.board[dest[0]])
+        dest_row[dest[1]] = piece
+        self.board[dest[0]] = dest_row 
+
 class Game(Board):
 
     def __init__(self):
@@ -38,17 +48,7 @@ class Game(Board):
         else:
             return "black"
 
-    def update_board(self, piece, origin, dest):
-
-        origin_row = list(board.board[origin[0]])
-        origin_row[origin[1]] = '.'
-        board.board[origin[0]] = origin_row
-        
-        dest_row = list(board.board[dest[0]])
-        dest_row[dest[1]] = piece
-        board.board[dest[0]] = dest_row 
-
-    def parse_command(self, command, board):
+    def parse_command(self, command):
 
         command = command.upper().strip()
         match =  re.match(r"[A-H][1-8][A-H][1-8]$", command)
@@ -57,11 +57,11 @@ class Game(Board):
             print "Not a valid request"
             return False
 
-        origin = (int(command[1])-1, board.alphabet.index(command[0]))
-        dest = (int(command[3])-1, board.alphabet.index(command[2]))
+        origin = (int(command[1])-1, self.alphabet.index(command[0]))
+        dest = (int(command[3])-1, self.alphabet.index(command[2]))
 
-        active_piece = board.board[origin[0]][origin[1]]
-        piece_at_destination =  board.board[dest[0]][dest[1]]
+        active_piece = self.board[origin[0]][origin[1]]
+        piece_at_destination =  self.board[dest[0]][dest[1]]
 
         if piece_at_destination == '.':
             capture = False   
@@ -71,9 +71,17 @@ class Game(Board):
             print "Your {0} is already occupying {1}".format(piece_at_destination, dest)
             return 
 
+        print origin
+        return active_piece, origin, dest
+
+    def validate(self, command):
+        piece, origin, destination = parse_command(command)
 
 
 g = Game()
 g.create_new_board()
 g.display()
-g.parse_command("A1A3", g)
+g.parse_command("A1A3")
+g.display()
+g.parse_command("C2C3")
+g.display()
