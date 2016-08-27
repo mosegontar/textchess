@@ -1,7 +1,7 @@
-import numpy 
+import numpy
 
 PAWN = {'deltas': [(1,0)],
-        'infinite': True,
+        'infinite': False,
         'backwards': False}
 
 ROOK = {'deltas': [(1,0), (0,1)],
@@ -32,30 +32,57 @@ class Piece(object):
         self.infinite = infinite
         self.backwards = backwards
 
-    def check_legal(self, origin, destination):
+    def track_move(self, origin, destination):
 
-        if self.infinite:
+        delta = tuple(numpy.subtract(destination, origin))
+
+        for d in self.legal_delta:
             new_origin = origin
-            for d in self.legal_delta:
-                moves = []
-                moves.append(new_origin)
-                while True:
-                    if destination[0] > origin[0]:
-                        m = tuple(numpy.add(d, new_origin))
-                    else:
-                        m = type(abs(numpy.subtract(d, new_origin)))
-                    if m[0] > 8:
-                        break
-                    elif m == destination:
-                        moves.append(m)
-                        return moves
-                    else:
-                        moves.append(m)
-                    new_origin = m
-            return False
-                        
+            moves = []
+            moves.append(new_origin)
 
-p = Piece(BISHOP['deltas'], BISHOP['infinite'], BISHOP['backwards'])
+            while True:
 
-print p.check_legal((-2, -1), (1,2))
+                a = new_origin[0] + d[0] if delta[0] >= 0 else new_origin[0] - d[0]
+                b = new_origin[1] + d[1] if delta[1] >= 1 else new_origin[1] - d[1]
+                m = (a,b)
+
+                if [y for y in m if abs(y) > 8]:
+                    break
+                elif m == destination:
+                    moves.append(m)
+                    return moves
+                else:
+                    moves.append(m)
+                new_origin = m
+
+        return False
+
+
+def test_trackmove():
+
+    PIECE = ROOK
+    p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
+    assert p.track_move((0, 0), (0,-2)) == [(0, 0), (0, -1), (0, -2)]
+
+    PIECE = BISHOP
+    p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
+    assert p.track_move((0, 0), (-3,-3)) == [(0, 0), (-1, -1), (-2, -2), (-3, -3)]
+    assert p.track_move((0, 0), (-3,-3)) != [(0, 0), (-1, -1), (-2, -2), (-3, -2)]
+    assert p.track_move((0, 0), (-3,-2)) != [(0, 0), (-1, -1), (-2, -2), (-3, -3)]
+    assert p.track_move((0, 0), (3, 3)) == [(0, 0), (1, 1), (2, 2), (3, 3)]
+    assert p.track_move((0, 0), (2, -2)) == [(0, 0), (1, -1), (2, -2)]
+    assert p.track_move((0, 0), (2, -2)) != [(0, 0), (1, -1), (2, -1)]
+
+    PIECE = QUEEN
+    p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
+    assert p.track_move((0, 0), (-3,-3)) == [(0, 0), (-1, -1), (-2, -2), (-3, -3)]
+    assert p.track_move((0, 0), (-3,-3)) != [(0, 0), (-1, -1), (-2, -2), (-3, -2)]
+    assert p.track_move((0, 0), (-3,-2)) != [(0, 0), (-1, -1), (-2, -2), (-3, -3)]
+    assert p.track_move((0, 0), (3, 3)) == [(0, 0), (1, 1), (2, 2), (3, 3)]
+    assert p.track_move((0, 0), (2, -2)) == [(0, 0), (1, -1), (2, -2)]
+    assert p.track_move((0, 0), (2, -2)) != [(0, 0), (1, -1), (2, -1)]
+
+
+
 
