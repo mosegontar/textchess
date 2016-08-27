@@ -55,6 +55,8 @@ class Piece(object):
                 else:
                     moves.append(m)
                 new_origin = m
+                if not self.infinite:
+                    break
 
         return False
 
@@ -64,6 +66,11 @@ def test_trackmove():
     PIECE = ROOK
     p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
     assert p.track_move((0, 0), (0,-2)) == [(0, 0), (0, -1), (0, -2)]
+    assert p.track_move((0, 0), (-8, 0)) == [(0, 0), (-1, 0), (-2, 0), (-3, 0), (-4, 0), (-5, 0), (-6, 0), (-7, 0), (-8, 0)]
+    assert p.track_move((-1, -1), (1, -1)) == [(-1, -1), (0, -1), (1, -1)]
+
+    #PIECE = KNIGHT
+    #p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
 
     PIECE = BISHOP
     p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
