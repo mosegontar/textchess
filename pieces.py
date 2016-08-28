@@ -43,25 +43,25 @@ class Piece(object):
 
             while True:
 
-                a = new_origin[0] + d[0] if delta[0] >= 0 else new_origin[0] - d[0]
-                b = new_origin[1] + d[1] if delta[1] >= 1 else new_origin[1] - d[1]
-                m = (a,b)
+                y = new_origin[0] + d[0] if delta[0] >= 0 else new_origin[0] - d[0]
+                x = new_origin[1] + d[1] if delta[1] >= 1 else new_origin[1] - d[1]
+                move = (y, x)
 
-                if [y for y in m if abs(y) > 8]:
+                if [i for i in move if abs(i) > 8]:
                     break
-                elif m == destination:
-                    moves.append(m)
+                elif move == destination:
+                    moves.append(move)
                     return moves
-                else:
-                    moves.append(m)
-                new_origin = m
-                if not self.infinite:
+                elif not self.infinite:
                     break
+                else:
+                    moves.append(move)
+                    new_origin = move
 
         return False
 
 
-def test_trackmove():
+def test_track_move():
 
     PIECE = ROOK
     p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
@@ -69,8 +69,16 @@ def test_trackmove():
     assert p.track_move((0, 0), (-8, 0)) == [(0, 0), (-1, 0), (-2, 0), (-3, 0), (-4, 0), (-5, 0), (-6, 0), (-7, 0), (-8, 0)]
     assert p.track_move((-1, -1), (1, -1)) == [(-1, -1), (0, -1), (1, -1)]
 
-    #PIECE = KNIGHT
-    #p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
+    PIECE = KNIGHT
+    p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
+    assert p.track_move((0, 0), (2, 1)) == [(0, 0), (2, 1)]
+    assert p.track_move((-3, -2), (-1, -1)) == [(-3, -2), (-1, -1)]
+    assert len(p.track_move((1, 1), (3, 2))) == 2
+    assert p.track_move((-4, 0), (-3, 2)) == [(-4,0), (-3, 2)]
+    assert p.track_move((-4, 0), (-3, -2)) == [(-4, 0), (-3, -2)]
+    assert p.track_move((-2, 0), (-4, -1)) == [(-2, 0), (-4, -1)]
+    assert p.track_move((-8, -2), (-7, 0)) == [(-8, -2), (-7, 0)]
+    assert p.track_move((-8, -2), (-6, 2)) == False
 
     PIECE = BISHOP
     p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
