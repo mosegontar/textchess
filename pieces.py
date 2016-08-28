@@ -1,40 +1,48 @@
 import numpy
 
-PAWN = {'deltas': [(1,0)],
-        'infinite': False,
-        'backwards': False}
-
-ROOK = {'deltas': [(1,0), (0,1)],
-        'infinite': True,
-        'backwards': True}
-
-KNIGHT = {'deltas': [(1,2), (2, 1)],
-          'infinite': False,
-          'backwards': True}
-
-BISHOP = {'deltas': [(1,1)],
-          'infinite': True,
-          'backwards': True}
-
-QUEEN = {'deltas': [(1,1), (1,0), (0, 1)],
-         'infinite': True,
-         'backwards': True}
-
-
-KING = {'deltas': [(1,1), (1,0), (0, 1)],
-        'infinite': False,
-        'backwards': True}
-
 class Piece(object):
+    
+    PIECES = {'P': {'name': 'Pawn',
+                    'deltas': [(1,0)],
+                    'backwards': False,
+                    'jump': False}, 
+              'R': {'name': 'Rook',
+                    'deltas': [(1,0), (0,1)],
+                    'backwards': True,
+                    'jump': False},
+              'N': {'name': 'Knight', 
+                    'deltas': [(1,2), (2, 1)],
+                    'backwards': True,
+                    'jump': False},
+              'B': {'name': 'Bishop',
+                    'deltas': [(1,1)],
+                    'backwards': True,
+                    'jump': False},
+              'Q': {'name': 'Queen',
+                    'deltas': [(1,1), (1,0), (0, 1)],
+                    'backwards': True,
+                    'jump': False,},
+              'K': {'name': 'King',
+                    'deltas': [(1,1), (1,0), (0, 1)],
+                    'backwards': True,
+                    'jump': False,}
+    }    
 
-    def __init__(self, legal_delta, infinite, backwards):
-        self.legal_delta = legal_delta
-        self.infinite = infinite
-        self.backwards = backwards
+    def __init__(self, symbol):
+        self.symbol = symbol
+        self.piece = Piece.PIECES[symbol]
+        self.name = self.piece['name']
+        self.legal_delta = self.piece['deltas']
+        self.backwards = self.piece['backwards']
+        self.jump = self.piece['jump']
 
     def track_move(self, origin, destination):
-
+        
         delta = tuple(numpy.subtract(destination, origin))
+
+        # check if piece is making illegal move backwards
+        if delta[0] < 0 and not self.backwards:
+            return False
 
         for d in self.legal_delta:
             new_origin = origin
@@ -42,7 +50,6 @@ class Piece(object):
             moves.append(new_origin)
 
             while True:
-
                 y = new_origin[0] + d[0] if delta[0] >= 0 else new_origin[0] - d[0]
                 x = new_origin[1] + d[1] if delta[1] >= 1 else new_origin[1] - d[1]
                 move = (y, x)
@@ -51,9 +58,16 @@ class Piece(object):
                     break
                 elif move == destination:
                     moves.append(move)
+                    
+                    if self.name == 'Pawn':
+                        if (len(moves) == 3 and origin[0] != 1) or len(moves) > 3:
+                            return False
+
+                    if self.name == 'Knight' and len(moves) > 2:
+                        return False
+
                     return moves
-                elif not self.infinite:
-                    break
+
                 else:
                     moves.append(move)
                     new_origin = move
@@ -63,14 +77,12 @@ class Piece(object):
 
 def test_track_move():
 
-    PIECE = ROOK
-    p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
+    p = Piece('R')
     assert p.track_move((0, 0), (0,-2)) == [(0, 0), (0, -1), (0, -2)]
     assert p.track_move((0, 0), (-8, 0)) == [(0, 0), (-1, 0), (-2, 0), (-3, 0), (-4, 0), (-5, 0), (-6, 0), (-7, 0), (-8, 0)]
     assert p.track_move((-1, -1), (1, -1)) == [(-1, -1), (0, -1), (1, -1)]
 
-    PIECE = KNIGHT
-    p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
+    p = Piece('N')
     assert p.track_move((0, 0), (2, 1)) == [(0, 0), (2, 1)]
     assert p.track_move((-3, -2), (-1, -1)) == [(-3, -2), (-1, -1)]
     assert len(p.track_move((1, 1), (3, 2))) == 2
@@ -80,8 +92,7 @@ def test_track_move():
     assert p.track_move((-8, -2), (-7, 0)) == [(-8, -2), (-7, 0)]
     assert p.track_move((-8, -2), (-6, 2)) == False
 
-    PIECE = BISHOP
-    p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
+    p = Piece('B')
     assert p.track_move((0, 0), (-3,-3)) == [(0, 0), (-1, -1), (-2, -2), (-3, -3)]
     assert p.track_move((0, 0), (-3,-3)) != [(0, 0), (-1, -1), (-2, -2), (-3, -2)]
     assert p.track_move((0, 0), (-3,-2)) != [(0, 0), (-1, -1), (-2, -2), (-3, -3)]
@@ -89,15 +100,10 @@ def test_track_move():
     assert p.track_move((0, 0), (2, -2)) == [(0, 0), (1, -1), (2, -2)]
     assert p.track_move((0, 0), (2, -2)) != [(0, 0), (1, -1), (2, -1)]
 
-    PIECE = QUEEN
-    p = Piece(PIECE['deltas'], PIECE['infinite'], PIECE['backwards'])
+    p = Piece('Q')
     assert p.track_move((0, 0), (-3,-3)) == [(0, 0), (-1, -1), (-2, -2), (-3, -3)]
     assert p.track_move((0, 0), (-3,-3)) != [(0, 0), (-1, -1), (-2, -2), (-3, -2)]
     assert p.track_move((0, 0), (-3,-2)) != [(0, 0), (-1, -1), (-2, -2), (-3, -3)]
     assert p.track_move((0, 0), (3, 3)) == [(0, 0), (1, 1), (2, 2), (3, 3)]
     assert p.track_move((0, 0), (2, -2)) == [(0, 0), (1, -1), (2, -2)]
     assert p.track_move((0, 0), (2, -2)) != [(0, 0), (1, -1), (2, -1)]
-
-
-
-
