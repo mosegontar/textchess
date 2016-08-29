@@ -16,6 +16,14 @@ class Board(object):
         self.board[1] = ['P' for i in range(8)]
         self.board[0] = [piece.upper() for piece in 'rnbqkbnr']
 
+    def display(self):
+        """Displays current board"""
+
+        print('     ' + '  '.join(list(self.alphabet)))
+        print()
+        for row_num, row in enumerate(self.board[::-1]):
+            print(str(8-row_num) + '   ', '  '.join(row))
+        print()
 
     def update_board(self, piece, origin, dest):
         """Update current board with new move"""
@@ -49,11 +57,9 @@ class Game(Board):
         else:
             return "black"
 
-    def display(self):
+    def next_player(self):
         """Displays current board"""
 
-        for row in self.board[::-1]:
-            print('  '.join(row))
 
         temp = list(zip(*self.board))[::-1]
         self.board = list(zip(*temp))[::-1]
@@ -76,7 +82,6 @@ class Game(Board):
 
     def parse_command(self, command):
         """Parse and return False if not valid"""
-
         command = command.upper().strip()
         match = re.match(r"[A-H][1-8][A-H][1-8]$", command)
 

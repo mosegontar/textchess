@@ -11,6 +11,8 @@ def main():
         if command == 'Q':
             break
         validated = game.validate(command)
+        if validated:
+            game.next_player()
 
 
 
