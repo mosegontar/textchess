@@ -16,14 +16,6 @@ class Board(object):
         self.board[1] = ['P' for i in range(8)]
         self.board[0] = [piece.upper() for piece in 'rnbqkbnr']
 
-    def display(self):
-        """Displays current board"""
-
-        print('     ' + '  '.join(list(self.alphabet)))
-        print()
-        for row_num, row in enumerate(self.board[::-1]):
-            print(str(8-row_num) + '   ', '  '.join(row))
-        print()
 
     def update_board(self, piece, origin, dest):
         """Update current board with new move"""
@@ -47,6 +39,7 @@ class Game(Board):
         self.white_castle = True
         self.black_castle = True
 
+
     @property
     def determine_player(self):
         """Determine which player is playing based on length of game so far"""
@@ -55,6 +48,31 @@ class Game(Board):
             return "white"
         else:
             return "black"
+
+    def display(self):
+        """Displays current board"""
+
+        for row in self.board[::-1]:
+            print('  '.join(row))
+
+        temp = list(zip(*self.board))[::-1]
+        self.board = list(zip(*temp))[::-1]
+
+
+        for row_num, row in enumerate(self.board):
+            for col_num, item in enumerate(row):
+                row = list()
+                if item == '.':
+                    pass
+                elif item.isupper():
+                    row = list(self.board[row_num])
+                    row[col_num] = item.lower()
+                    self.board[row_num] = row
+                else:
+                    row = list(self.board[row_num])
+                    row[col_num] = item.upper()
+                    self.board[row_num] = row
+
 
     def parse_command(self, command):
         """Parse and return False if not valid"""
@@ -70,6 +88,9 @@ class Game(Board):
         dest = (int(command[3])-1, self.alphabet.index(command[2]))
 
         symbol_at_origin = self.board[origin[0]][origin[1]]
+        if symbol_at_origin not in "RNBQKP":
+            print(symbol_at_origin)
+            return False, None, None
 
         piece_at_origin = pieces.Piece(symbol_at_origin)
 
@@ -107,6 +128,7 @@ class Game(Board):
 
         piece, origin, destination = self.parse_command(command)
         if not piece:
+            print('Sorry this just didnt work')
             return False
 
         movement = piece.track_move(origin, destination)
@@ -125,7 +147,7 @@ class Game(Board):
 
         if not success:
             print("Sorry :(, illegal move :(")
-            return
+            return False
 
         if capture:
             piece_name = pieces.Piece.PIECES[capture.upper()]['name']
@@ -136,7 +158,10 @@ class Game(Board):
         self.update_board(piece.symbol, origin, destination)
         
         self.history.append((piece.symbol, command))
+        return True
 
+
+"""
 g = Game()
 g.create_new_board()
 g.display()
@@ -158,3 +183,5 @@ g.validate('B2G7')
 g.display()
 print()
 print(g.history)
+print()
+"""

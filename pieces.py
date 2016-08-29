@@ -37,7 +37,7 @@ class Piece(object):
         self.jump = self.piece['jump']
 
     def track_move(self, origin, destination):
-        
+
         delta = tuple(numpy.subtract(destination, origin))
 
         # check if piece is making illegal move backwards
@@ -61,9 +61,11 @@ class Piece(object):
                     
                     if self.name == 'Pawn':
                         if (len(moves) == 3 and origin[0] != 1) or len(moves) > 3:
+                            print("Pawn can't move there")
                             return False
 
                     if self.name == 'Knight' and len(moves) > 2:
+                        print("Knight can't move there")
                         return False
 
                     return moves
