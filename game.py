@@ -40,6 +40,9 @@ class Board(object):
                     self.board[row_num] = row
 
 
+    def piece_at_space(self, x, y):
+        return self.board[y][x]
+
     def update_board(self, piece, origin, dest):
         """Update current board with new move"""
 
@@ -84,7 +87,7 @@ class Game(Board):
         origin = (int(command[1])-1, self.alphabet.index(command[0]))
         dest = (int(command[3])-1, self.alphabet.index(command[2]))
 
-        symbol_at_origin = self.board[origin[0]][origin[1]]
+        symbol_at_origin = self.piece_at_space(origin[1], origin[0])
         if symbol_at_origin not in "RNBQKP":
             print(symbol_at_origin)
             return False, None, None
@@ -97,7 +100,7 @@ class Game(Board):
         """Check if other pieces block  active piece's path to destination"""
 
         for move in movement[1:-1]:
-            occupied = self.board[move[0]][move[1]]
+            occupied = self.piece_at_space(move[1], move[0])
             if occupied != '.' and not piece.jump:
                 return True
 
@@ -106,7 +109,7 @@ class Game(Board):
     def check_capture(self, dest):
         """Check whether the active piece captures enemy at destination"""
 
-        piece_at_destination = self.board[dest[0]][dest[1]]
+        piece_at_destination = self.piece_at_space(dest[1], dest[0])
 
         if piece_at_destination == '.':
             capture = False
@@ -153,8 +156,8 @@ class Game(Board):
             pass
         
         self.update_board(piece.symbol, origin, destination)
-        
         self.history.append((piece.symbol, command))
+        
         return True
 
 
