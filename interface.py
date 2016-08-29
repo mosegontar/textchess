@@ -12,7 +12,7 @@ def main():
             break
         validated = game.validate(command)
         if validated:
-            game.next_player()
+            game.rotate()
 
 
 

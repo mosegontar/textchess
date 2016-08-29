@@ -25,6 +25,21 @@ class Board(object):
             print(str(8-row_num) + '   ', '  '.join(row))
         print()
 
+    def rotate(self):
+
+        temp = list(zip(*self.board))[::-1]
+        self.board = list(zip(*temp))[::-1]
+
+        for row_num, row in enumerate(self.board):
+            for col_num, item in enumerate(row):
+                if item == '.':
+                    pass
+                else:
+                    row = list(self.board[row_num])
+                    row[col_num] = item.lower() if item.isupper() else item.upper()
+                    self.board[row_num] = row
+
+
     def update_board(self, piece, origin, dest):
         """Update current board with new move"""
 
@@ -56,29 +71,6 @@ class Game(Board):
             return "white"
         else:
             return "black"
-
-    def next_player(self):
-        """Displays current board"""
-
-
-        temp = list(zip(*self.board))[::-1]
-        self.board = list(zip(*temp))[::-1]
-
-
-        for row_num, row in enumerate(self.board):
-            for col_num, item in enumerate(row):
-                row = list()
-                if item == '.':
-                    pass
-                elif item.isupper():
-                    row = list(self.board[row_num])
-                    row[col_num] = item.lower()
-                    self.board[row_num] = row
-                else:
-                    row = list(self.board[row_num])
-                    row[col_num] = item.upper()
-                    self.board[row_num] = row
-
 
     def parse_command(self, command):
         """Parse and return False if not valid"""
