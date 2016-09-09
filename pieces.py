@@ -36,6 +36,36 @@ class Piece(object):
         self.backwards = self.piece['backwards']
         self.jump = self.piece['jump']
 
+    def get_path(self):
+        new_origin = origin
+        moves = []
+        moves.append(new_origin)
+
+        while True:
+            y = new_origin[0] + d[0] if delta[0] >= 0 else new_origin[0] - d[0]
+            x = new_origin[1] + d[1] if delta[1] >= 1 else new_origin[1] - d[1]
+            move = (y, x)
+
+            if [i for i in move if abs(i) > 8]:
+                return False
+            elif move == destination:
+                moves.append(move)
+                
+                if self.name == 'Pawn':
+                    if (len(moves) == 3 and origin[0] != 1) or len(moves) > 3:
+                        print("Pawn can't move there")
+                        return False
+
+                if self.name == 'Knight' and len(moves) > 2:
+                    print("Knight can't move there")
+                    return False
+
+                return moves
+
+            else:
+                moves.append(move)
+                new_origin = move
+
     def track_move(self, origin, destination):
 
         delta = tuple(numpy.subtract(destination, origin))

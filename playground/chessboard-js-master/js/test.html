@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chess Board</title>
+<link type="text/css" rel="stylesheet" href="chessboard.css"></link>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
+
+<script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+<script type="text/javascript" src="chessboard.js"></script>
+</head>
+<body>
+    <h1>CHESS BOARD</h1>
+        <div id="board" style="width:100%">
+
+<script>
+
+var board = new Chessboard('board', {
+  position: ChessUtils.FEN.startId,
+  eventHandlers: {
+    onPieceSelected: pieceSelected,
+  }
+});
+
+
+
+
+function pieceSelected(notationSquare) {
+ console.log(notationSquare)
+ console.log(board.getPosition(ChessUtils.NOTATION.id))
+ board.move('b2-b3')
+ console.log(board.getPosition(ChessUtils.NOTATION.id))
+}
+
+
+</script>
+
+
+</body>
+</html>
